@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "171136651407",
+    "project_id": "proyecto-portoviejo",
+    "storage_bucket": "proyecto-portoviejo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:171136651407:android:13180548c87e147ae460fa",
+        "android_client_info": {
+          "package_name": "com.example.antipanico_portoviejo_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "171136651407-ueup3h20drq1h6a0s060i00u8nkmfeht.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgeFz1YOCEoN19KBZszYz9kR9m5iEBVt8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "171136651407-ueup3h20drq1h6a0s060i00u8nkmfeht.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

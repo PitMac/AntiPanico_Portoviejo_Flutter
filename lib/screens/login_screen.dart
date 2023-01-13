@@ -142,22 +142,22 @@ class FormWidget extends StatelessWidget {
       ),
     );
   }
-}
 
-Widget textField(
-    String title, bool isPassword, String hintText, IconData icon) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(title, style: const TextStyle(fontSize: 16)),
-      TextField(
-        style: const TextStyle(color: Colors.white),
-        obscureText: isPassword,
-        decoration: InputDecoration(
-          prefixIcon: Icon(icon),
-          hintText: hintText,
+  Widget textField(
+      String title, bool isPassword, String hintText, IconData icon) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: const TextStyle(fontSize: 16)),
+        TextField(
+          style: const TextStyle(color: Colors.white),
+          obscureText: isPassword,
+          decoration: InputDecoration(
+            prefixIcon: Icon(icon),
+            hintText: hintText,
+          ),
         ),
-      ),
-    ],
-  );
+      ],
+    );
+  }
 }

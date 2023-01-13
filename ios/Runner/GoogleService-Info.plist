@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>171136651407-6ru68hmt1rp3f0ij1ik0ibc5bu7ce4fq.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.171136651407-6ru68hmt1rp3f0ij1ik0ibc5bu7ce4fq</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDhiCAFB33wSVNH8wnhC4pldfYh--oxFuM</string>
+	<key>GCM_SENDER_ID</key>
+	<string>171136651407</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.antipanicoPortoviejoFlutter</string>
+	<key>PROJECT_ID</key>
+	<string>proyecto-portoviejo</string>
+	<key>STORAGE_BUCKET</key>
+	<string>proyecto-portoviejo.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:171136651407:ios:7383e6024a2dc558e460fa</string>
+</dict>
+</plist>
