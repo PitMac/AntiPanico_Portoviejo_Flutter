@@ -1,5 +1,8 @@
+import 'package:antipanico_portoviejo_flutter/providers/validation_provider.dart';
+import 'package:antipanico_portoviejo_flutter/widgets/snack_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:provider/provider.dart';
 
 class RegisterScreen extends HookWidget {
   const RegisterScreen({super.key});
@@ -8,6 +11,12 @@ class RegisterScreen extends HookWidget {
   Widget build(BuildContext context) {
     final seePassword = useState(true);
     final size = MediaQuery.of(context).size;
+    final namesController = useTextEditingController(text: '');
+    final lastnamesController = useTextEditingController(text: '');
+    final cedulaController = useTextEditingController(text: '');
+    final emailController = useTextEditingController(text: '');
+    final passwordController = useTextEditingController(text: '');
+    final validationProvider = Provider.of<ValidationProvider>(context);
 
     return Scaffold(
       body: Container(
@@ -67,17 +76,24 @@ class RegisterScreen extends HookWidget {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      textField('Nombre: ', false, Icons.abc_rounded),
+                      textField('Nombres: ', false, Icons.abc_rounded,
+                          namesController, false),
                       const SizedBox(height: 15),
-                      textField('Apellidos: ', false, Icons.abc_rounded),
+                      textField('Apellidos: ', false, Icons.abc_rounded,
+                          lastnamesController, false),
+                      const SizedBox(height: 15),
+                      textField('Cedula: ', false, Icons.account_circle_rounded,
+                          cedulaController, true),
                       const SizedBox(height: 15),
                       textField(
-                          'Cedula: ', false, Icons.account_circle_rounded),
-                      const SizedBox(height: 15),
-                      textField(
-                          'Correo: ', false, Icons.alternate_email_rounded),
+                          'Correo: ',
+                          false,
+                          Icons.alternate_email_rounded,
+                          emailController,
+                          false),
                       const SizedBox(height: 15),
                       TextField(
+                        controller: passwordController,
                         obscureText: seePassword.value,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.password),
@@ -107,10 +123,26 @@ class RegisterScreen extends HookWidget {
                         margin: const EdgeInsets.symmetric(horizontal: 10),
                         child: ElevatedButton(
                           style: ButtonStyle(
-                              backgroundColor: MaterialStateColor.resolveWith(
-                                  (states) => Colors.blueAccent)),
+                            backgroundColor: MaterialStateColor.resolveWith(
+                                (states) => Colors.blueAccent),
+                          ),
                           onPressed: () {
-                            Navigator.pushReplacementNamed(context, '/home');
+                            final state =
+                                validationProvider.isSecureRegisterForm(
+                              namesController,
+                              lastnamesController,
+                              cedulaController,
+                              emailController,
+                              passwordController,
+                            );
+                            if (state) {
+                              Navigator.pushReplacementNamed(context, '/home');
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                snackBarWidget(
+                                    validationProvider, Colors.redAccent),
+                              );
+                            }
                           },
                           child: const Text(
                             'Registrar',
@@ -146,12 +178,13 @@ class RegisterScreen extends HookWidget {
     );
   }
 
-  Widget textField(String title, bool isPassword, IconData icon) {
+  Widget textField(String title, bool isPassword, IconData icon,
+      TextEditingController controller, bool iscedula) {
     return TextField(
+      controller: controller,
       obscureText: isPassword,
+      keyboardType: iscedula ? TextInputType.number : null,
       decoration: InputDecoration(
-        // icon: const Icon(Icons.abc),
-
         prefixIcon: Icon(icon),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
@@ -161,100 +194,3 @@ class RegisterScreen extends HookWidget {
     );
   }
 }
-
-// class RegisterScreen extends HookWidget {
-//   const RegisterScreen({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final seePassword = useState(true);
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text(
-//           'Registrar',
-//           style: TextStyle(color: Colors.white),
-//         ),
-//         backgroundColor: Colors.blueAccent,
-//       ),
-//       body: SingleChildScrollView(
-//         child: Container(
-//           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               const TextField(
-//                 decoration: InputDecoration(
-//                   border: OutlineInputBorder(),
-//                   labelText: 'Nombre:',
-//                 ),
-//               ),
-//               const SizedBox(height: 15),
-//               const TextField(
-//                 decoration: InputDecoration(
-//                   border: OutlineInputBorder(),
-//                   labelText: 'Apellidos:',
-//                 ),
-//               ),
-//               const SizedBox(height: 15),
-//               const TextField(
-//                 decoration: InputDecoration(
-//                   border: OutlineInputBorder(),
-//                   labelText: 'Cedula:',
-//                 ),
-//               ),
-//               const SizedBox(height: 15),
-//               const TextField(
-//                 decoration: InputDecoration(
-//                   border: OutlineInputBorder(),
-//                   labelText: 'Correo:',
-//                 ),
-//               ),
-//               const SizedBox(height: 15),
-//               TextField(
-//                 obscureText: seePassword.value,
-//                 decoration: InputDecoration(
-//                   border: const OutlineInputBorder(),
-//                   labelText: 'Contraseña:',
-//                   suffixIcon: IconButton(
-//                     onPressed: () {
-//                       seePassword.value = !seePassword.value;
-//                     },
-//                     icon: Icon(
-//                       seePassword.value
-//                           ? Icons.remove_red_eye_outlined
-//                           : Icons.remove_red_eye,
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//               const SizedBox(height: 20),
-//               Container(
-//                 width: double.infinity,
-//                 decoration: BoxDecoration(
-//                     color: Colors.blueAccent,
-//                     // gradient: const LinearGradient(colors: [
-//                     //   skyblueColor,
-//                     //   blueColor,
-//                     // ]),
-//                     borderRadius: BorderRadius.circular(20)),
-//                 margin: const EdgeInsets.symmetric(horizontal: 10),
-//                 child: ElevatedButton(
-//                   style: ButtonStyle(
-//                       backgroundColor: MaterialStateColor.resolveWith(
-//                           (states) => Colors.blueAccent)),
-//                   onPressed: () {
-//                     Navigator.pushReplacementNamed(context, '/home');
-//                   },
-//                   child: const Text(
-//                     'Registrar',
-//                     style: TextStyle(color: Colors.white),
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }

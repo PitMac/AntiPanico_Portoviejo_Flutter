@@ -31,11 +31,13 @@ class MapProvider with ChangeNotifier {
   }
 
   Future<List> getAlerts() async {
+    alerts = [];
     CollectionReference collectionReference = db.collection('alertas');
     QuerySnapshot querySnapshot = await collectionReference.get();
     for (var alert in querySnapshot.docs) {
       alerts.add(alert.data());
     }
+    notifyListeners();
     return alerts;
   }
 
@@ -46,7 +48,6 @@ class MapProvider with ChangeNotifier {
     for (var person in querySnapshot.docs) {
       people.add(person.data());
     }
-    print(people);
     notifyListeners();
     return people;
   }

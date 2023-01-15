@@ -79,12 +79,39 @@ class PrincipalScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mapProvider = Provider.of<MapProvider>(context);
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: Colors.blueAccent,
         label: const Text('Alertas'),
-        onPressed: () {},
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return mapProvider.alerts.isNotEmpty
+                  ? SizedBox(
+                      height: 600,
+                      child: ListView.builder(
+                        itemCount: mapProvider.alerts.length,
+                        itemBuilder: (_, i) {
+                          final alert = mapProvider.alerts[i];
+                          return ListTile(
+                            leading: const Icon(Icons.add_alert_rounded),
+                            title: Text(
+                                '${alert['nombres']} ${alert['apellidos']}'),
+                            subtitle: Text(
+                                "Latitud: ${alert['latitud']} ~ Longitud: ${alert['longitud']}"),
+                          );
+                        },
+                      ),
+                    )
+                  : const Center(
+                      child: CircularProgressIndicator(),
+                    );
+            },
+          );
+        },
         icon: const Icon(Icons.notification_important),
       ),
       body: SizedBox(

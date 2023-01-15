@@ -1,4 +1,8 @@
+import 'package:antipanico_portoviejo_flutter/providers/validation_provider.dart';
+import 'package:antipanico_portoviejo_flutter/widgets/snack_bar_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -55,7 +59,7 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
-class FormWidget extends StatelessWidget {
+class FormWidget extends HookWidget {
   const FormWidget({
     Key? key,
     required this.size,
@@ -65,6 +69,9 @@ class FormWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final emailController = useTextEditingController(text: '');
+    final passwordController = useTextEditingController(text: '');
+    final validationProvider = Provider.of<ValidationProvider>(context);
     return Align(
       alignment: Alignment.bottomCenter,
       child: SingleChildScrollView(
@@ -91,28 +98,34 @@ class FormWidget extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 25),
-              textField('Usuario: ', false, 'test@test.com', Icons.person),
+              textField('Correo: ', false, 'test@test.com', Icons.person,
+                  emailController),
               const SizedBox(height: 20),
-              textField('Contraseña: ', true, '*********', Icons.lock),
-              // const Expanded(child: SizedBox()),
+              textField('Contraseña: ', true, '*********', Icons.lock,
+                  passwordController),
               const SizedBox(height: 30),
-
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                    color: Colors.blueAccent,
-                    // gradient: const LinearGradient(colors: [
-                    //   skyblueColor,
-                    //   blueColor,
-                    // ]),
-                    borderRadius: BorderRadius.circular(20)),
+                  color: Colors.blueAccent,
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 margin: const EdgeInsets.symmetric(horizontal: 10),
                 child: ElevatedButton(
                   style: ButtonStyle(
-                      backgroundColor: MaterialStateColor.resolveWith(
-                          (states) => Colors.blueAccent)),
+                    backgroundColor: MaterialStateColor.resolveWith(
+                        (states) => Colors.blueAccent),
+                  ),
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/home');
+                    final state = validationProvider.isSecureLoginForm(
+                        emailController, passwordController);
+                    if (state) {
+                      Navigator.pushReplacementNamed(context, '/home');
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        snackBarWidget(validationProvider, Colors.redAccent),
+                      );
+                    }
                   },
                   child: const Text(
                     'Ingresar',
@@ -143,14 +156,14 @@ class FormWidget extends StatelessWidget {
     );
   }
 
-  Widget textField(
-      String title, bool isPassword, String hintText, IconData icon) {
+  Widget textField(String title, bool isPassword, String hintText,
+      IconData icon, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: const TextStyle(fontSize: 16)),
         TextField(
-          style: const TextStyle(color: Colors.white),
+          controller: controller,
           obscureText: isPassword,
           decoration: InputDecoration(
             prefixIcon: Icon(icon),

@@ -1,4 +1,5 @@
 import 'package:antipanico_portoviejo_flutter/providers/map_provider.dart';
+import 'package:antipanico_portoviejo_flutter/providers/validation_provider.dart';
 import 'package:antipanico_portoviejo_flutter/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +23,10 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (context) => MapProvider(),
-        )
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ValidationProvider(),
+        ),
       ],
       child: MaterialApp(
         title: 'Antipanico Portoviejo',
