@@ -1,11 +1,15 @@
+import 'dart:async';
+
 import 'package:antipanico_portoviejo_flutter/providers/map_provider.dart';
 import 'package:antipanico_portoviejo_flutter/screens/contacts_screen.dart';
 import 'package:antipanico_portoviejo_flutter/screens/map_screen.dart';
 import 'package:antipanico_portoviejo_flutter/screens/settings_screen.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends HookWidget {
@@ -14,11 +18,60 @@ class HomeScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final mapProvider = Provider.of<MapProvider>(context);
+    final isDeviceConnected = useState<bool>(false);
+    final isAlertSet = useState<bool>(false);
+    final subscription = useState<StreamSubscription?>(null);
+
+    showDialogBox() {
+      return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('No tiene conexión'),
+            content: const Text('Por favor verificar su conexión a Internet'),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  isAlertSet.value = false;
+                  isDeviceConnected.value =
+                      await InternetConnectionChecker().hasConnection;
+                  if (!isDeviceConnected.value) {
+                    showDialogBox();
+                    isAlertSet.value = true;
+                  } else {
+                    mapProvider.getPeople();
+                  }
+                },
+                child: const Text('Ok'),
+              )
+            ],
+          );
+        },
+      );
+    }
+
+    getConnectivity() =>
+        subscription.value = Connectivity().onConnectivityChanged.listen(
+          ((event) async {
+            isDeviceConnected.value =
+                await InternetConnectionChecker().hasConnection;
+            if (!isDeviceConnected.value && isAlertSet.value == false) {
+              showDialogBox();
+              isAlertSet.value = true;
+            }
+          }),
+        );
+
     useEffect(() {
       mapProvider.getCurrentLocation();
       mapProvider.getAlerts();
-      return null;
-    }, []);
+      mapProvider.getPeople();
+      getConnectivity();
+      return () {
+        subscription.value?.cancel();
+      };
+    }, [mapProvider.myPosition]);
     final currentIndex = useState(0);
     final screens = [
       const PrincipalScreen(),
@@ -39,7 +92,6 @@ class HomeScreen extends HookWidget {
           selectedIndex: currentIndex.value,
           tabBorderRadius: 10,
           onTabChange: (value) => {
-            mapProvider.getCurrentLocation(),
             currentIndex.value = value,
           },
           tabs: const [
@@ -74,7 +126,7 @@ class HomeScreen extends HookWidget {
   }
 }
 
-class PrincipalScreen extends StatelessWidget {
+class PrincipalScreen extends HookWidget {
   const PrincipalScreen({super.key});
 
   @override

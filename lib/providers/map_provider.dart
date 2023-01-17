@@ -1,12 +1,17 @@
+import 'dart:collection';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MapProvider with ChangeNotifier {
   LatLng? _myPosition;
   List alerts = [];
   List people = [];
+  LinkedHashMap? currentUser;
+  String? user;
 
   FirebaseFirestore db = FirebaseFirestore.instance;
 
@@ -37,7 +42,7 @@ class MapProvider with ChangeNotifier {
     for (var alert in querySnapshot.docs) {
       alerts.add(alert.data());
     }
-    notifyListeners();
+
     return alerts;
   }
 
@@ -48,7 +53,23 @@ class MapProvider with ChangeNotifier {
     for (var person in querySnapshot.docs) {
       people.add(person.data());
     }
+    findUser();
     notifyListeners();
     return people;
+  }
+
+  void findUser() {
+    currentUser = null;
+    for (var element in people) {
+      if (element['correo'] == user) {
+        currentUser = element;
+      }
+    }
+  }
+
+  Future<void> logOut() async {
+    user = null;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('user');
   }
 }

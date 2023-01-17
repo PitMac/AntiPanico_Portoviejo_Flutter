@@ -10,11 +10,6 @@ class PeopleScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final mapProvider = Provider.of<MapProvider>(context);
-
-    useEffect(() {
-      mapProvider.getPeople();
-      return null;
-    }, []);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,

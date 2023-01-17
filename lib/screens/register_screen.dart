@@ -1,3 +1,4 @@
+import 'package:antipanico_portoviejo_flutter/providers/map_provider.dart';
 import 'package:antipanico_portoviejo_flutter/providers/validation_provider.dart';
 import 'package:antipanico_portoviejo_flutter/widgets/snack_bar_widget.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ class RegisterScreen extends HookWidget {
     final emailController = useTextEditingController(text: '');
     final passwordController = useTextEditingController(text: '');
     final validationProvider = Provider.of<ValidationProvider>(context);
+    final mapProvider = Provider.of<MapProvider>(context);
 
     return Scaffold(
       body: Container(
@@ -126,7 +128,7 @@ class RegisterScreen extends HookWidget {
                             backgroundColor: MaterialStateColor.resolveWith(
                                 (states) => Colors.blueAccent),
                           ),
-                          onPressed: () {
+                          onPressed: () async {
                             final state =
                                 validationProvider.isSecureRegisterForm(
                               namesController,
@@ -136,7 +138,19 @@ class RegisterScreen extends HookWidget {
                               passwordController,
                             );
                             if (state) {
-                              Navigator.pushReplacementNamed(context, '/home');
+                              // Navigator.pushReplacementNamed(context, '/home');
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                snackBarWidget(
+                                    validationProvider, Colors.blueAccent),
+                              );
+                              await validationProvider.signIn(
+                                namesController,
+                                lastnamesController,
+                                cedulaController,
+                                emailController,
+                                passwordController,
+                              );
+                              mapProvider.getPeople();
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 snackBarWidget(
