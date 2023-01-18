@@ -45,6 +45,9 @@ dependencies:
   shared_preferences: ^2.0.16
   connectivity_plus: ^3.0.2
   internet_connection_checker: ^1.0.0+1
+  share_plus: ^6.3.0
+  flutter_local_notifications: 9.2.0
+  firebase_messaging: ^14.2.1
 
 dev_dependencies:
   # The "flutter_lints" package below contains a set of recommended lints to
