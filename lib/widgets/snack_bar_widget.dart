@@ -18,3 +18,21 @@ SnackBar snackBarWidget(ValidationProvider validationProvider, Color color) {
     backgroundColor: color,
   );
 }
+
+SnackBar snackBarWidget2(ValidationProvider validationProvider, Color color) {
+  return SnackBar(
+    content: Row(
+      children: [
+        const Text(
+          "Usuario creado",
+          style: TextStyle(color: Colors.white),
+        ),
+        const Expanded(child: SizedBox()),
+        if (validationProvider.isLoading)
+          const CircularProgressIndicator(color: Colors.white),
+      ],
+    ),
+    duration: const Duration(seconds: 2),
+    backgroundColor: color,
+  );
+}

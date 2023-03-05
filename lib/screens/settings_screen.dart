@@ -20,112 +20,127 @@ class SettingsScreen extends HookWidget {
     return Scaffold(
       appBar: appBarWidget(),
       body: mapProvider.currentUser != null
-          ? SizedBox(
-              width: double.infinity,
-              height: double.infinity,
-              child: Column(
-                children: [
-                  SizedBox(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 20),
-                        circleAvatar(mapProvider),
-                        const SizedBox(height: 10),
-                        Text(
-                          '${mapProvider.currentUser!['nombres']} ${mapProvider.currentUser!['apellidos']}',
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                        Text(
-                          '${mapProvider.currentUser!['cedula']}',
-                          style: const TextStyle(
-                            color: Colors.black38,
-                            fontSize: 15,
+          ? SingleChildScrollView(
+              child: SizedBox(
+                width: double.infinity,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 20),
+                          circleAvatar(mapProvider),
+                          const SizedBox(height: 10),
+                          Text(
+                            '${mapProvider.currentUser!['nombres']} ${mapProvider.currentUser!['apellidos']}',
+                            style: const TextStyle(fontSize: 20),
                           ),
-                        ),
-                        Text(
-                          '${mapProvider.currentUser!['correo']}',
-                          style: const TextStyle(
-                            color: Colors.black26,
-                            fontSize: 15,
-                          ),
-                        ),
-                        const Divider(),
-                        Column(
-                          children: [
-                            ListTile(
-                              title: Row(
-                                children: const [
-                                  Icon(Icons.verified),
-                                  SizedBox(width: 10),
-                                  Text('Versión de la aplicación'),
-                                ],
-                              ),
-                              trailing: const Text('1.0.0'),
+                          Text(
+                            '${mapProvider.currentUser!['cedula']}',
+                            style: const TextStyle(
+                              color: Colors.black38,
+                              fontSize: 15,
                             ),
-                            ListTile(
-                              title: Row(
-                                children: const [
-                                  Icon(Icons.info_rounded),
-                                  SizedBox(width: 10),
-                                  Text('Acerca de...'),
-                                ],
+                          ),
+                          Text(
+                            '${mapProvider.currentUser!['correo']}',
+                            style: const TextStyle(
+                              color: Colors.black26,
+                              fontSize: 15,
+                            ),
+                          ),
+                          const Divider(),
+                          Column(
+                            children: [
+                              ListTile(
+                                title: Row(
+                                  children: const [
+                                    Icon(Icons.verified),
+                                    SizedBox(width: 10),
+                                    Text('Versión de la aplicación'),
+                                  ],
+                                ),
+                                trailing: const Text('1.0.0'),
                               ),
-                              subtitle: const Text(
-                                'Anti-pánico Portoviejo es una aplicación desarrollada por el grupo de estudiantes de la facultad de ciencias informáticas de la universidad tecnica de Manabí, con el propósito de alerta a los usuarios, dando la seguridad de enviar alertas a personas a su alrededor, teniendo advertida a los usuarios registrados en nuestra aplicación.',
-                                style: TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 15,
+                              ListTile(
+                                title: Row(
+                                  children: const [
+                                    Icon(Icons.info_rounded),
+                                    SizedBox(width: 10),
+                                    Text('Acerca de...'),
+                                  ],
+                                ),
+                                subtitle: const Text(
+                                  'Anti-pánico Portoviejo es una aplicación desarrollada por el grupo de estudiantes de la facultad de ciencias informáticas de la universidad tecnica de Manabí, con el propósito de alerta a los usuarios, dando la seguridad de enviar alertas a personas a su alrededor, teniendo advertida a los usuarios registrados en nuestra aplicación.',
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 15,
+                                  ),
                                 ),
                               ),
-                            ),
-                            ListTile(
-                              title: Row(
-                                children: const [
-                                  Icon(Icons.dangerous_rounded),
-                                  SizedBox(width: 10),
-                                  Text('Eliminar cuenta'),
-                                ],
+                              ListTile(
+                                title: Row(
+                                  children: const [
+                                    Icon(Icons.exit_to_app),
+                                    SizedBox(width: 10),
+                                    Text('Cerrar sesión'),
+                                  ],
+                                ),
+                                onTap: () {
+                                  mapProvider.logOut();
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    '/login',
+                                  );
+                                },
                               ),
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: const Text('Eliminar cuenta'),
-                                      content: const Text(
-                                          'Estás seguro de querer eliminar la cuenta?'),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text('No'),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text('Si'),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                            )
-                          ],
-                        ),
-                      ],
+                              ListTile(
+                                title: Row(
+                                  children: const [
+                                    Icon(Icons.dangerous_rounded),
+                                    SizedBox(width: 10),
+                                    Text('Eliminar cuenta'),
+                                  ],
+                                ),
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: const Text('Eliminar cuenta'),
+                                        content: const Text(
+                                            'Estás seguro de querer eliminar la cuenta?'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text('No'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text('Si'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             )
           : const Center(
               child: CircularProgressIndicator(),
             ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: logOutButton(mapProvider, context),
     );
   }
 
@@ -137,23 +152,6 @@ class SettingsScreen extends HookWidget {
       child: Text(
         '${mapProvider.currentUser!['nombres'][0]}${mapProvider.currentUser!['apellidos'][0]}',
         style: const TextStyle(fontSize: 70, color: Colors.white),
-      ),
-    );
-  }
-
-  TextButton logOutButton(MapProvider mapProvider, BuildContext context) {
-    return TextButton(
-      onPressed: () {
-        mapProvider.logOut();
-        Navigator.pushReplacementNamed(context, '/login');
-      },
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.exit_to_app, color: Colors.red),
-          SizedBox(width: 5),
-          Text('Cerrar Sesion', style: TextStyle(fontSize: 16)),
-        ],
       ),
     );
   }

@@ -1,16 +1,14 @@
 import 'dart:async';
 
 import 'package:antipanico_portoviejo_flutter/providers/map_provider.dart';
-import 'package:antipanico_portoviejo_flutter/screens/contacts_screen.dart';
+import 'package:antipanico_portoviejo_flutter/providers/notification_provider.dart';
+import 'package:antipanico_portoviejo_flutter/screens/alerts_screen.dart';
 import 'package:antipanico_portoviejo_flutter/screens/map_screen.dart';
 import 'package:antipanico_portoviejo_flutter/screens/settings_screen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:provider/provider.dart';
@@ -21,12 +19,10 @@ class HomeScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final mapProvider = Provider.of<MapProvider>(context);
+    final notProvider = Provider.of<NotificationProvider>(context);
     final isDeviceConnected = useState<bool>(false);
     final isAlertSet = useState<bool>(false);
     final subscription = useState<StreamSubscription?>(null);
-    final mtoken = useState<String?>(null);
-    late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
 
     showDialogBox() {
       return showDialog(
@@ -69,109 +65,33 @@ class HomeScreen extends HookWidget {
           }),
         );
 
-    requestPermission() async {
-      FirebaseMessaging messaging = FirebaseMessaging.instance;
-      NotificationSettings settings = await messaging.requestPermission(
-        alert: true,
-        announcement: true,
-        badge: true,
-        carPlay: false,
-        criticalAlert: true,
-        provisional: false,
-        sound: true,
-      );
-      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        print('User granted permission');
-      } else if (settings.authorizationStatus ==
-          AuthorizationStatus.provisional) {
-        print('User granted provisional permission');
-      } else {
-        print('User declined or has not accepted permission');
-      }
-    }
-
-    saveToken(String token) async {
-      await FirebaseFirestore.instance
-          .collection("UserTokens")
-          .doc(mapProvider.user)
-          .set({'token': token});
-    }
-
-    getToken() async {
-      await FirebaseMessaging.instance.getToken().then(
-            (value) => {
-              mtoken.value = value,
-              print("My token is ${mtoken.value}"),
-              print(mapProvider.tokens),
-              saveToken(value!)
-            },
-          );
-    }
-
-    initInfo() {
-      var androidInitialize =
-          const AndroidInitializationSettings('@mipmap/ic_launcher');
-      var initializationSettings =
-          InitializationSettings(android: androidInitialize);
-      flutterLocalNotificationsPlugin.initialize(
-        initializationSettings,
-        onSelectNotification: (payload) async {
-          try {
-            if (payload != null && payload.isNotEmpty) {
-            } else {}
-          } catch (e) {}
-          return;
-        },
-      );
-
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-        BigTextStyleInformation bigTextStyleInformation =
-            BigTextStyleInformation(
-          message.notification!.body.toString(),
-          htmlFormatBigText: true,
-          contentTitle: message.notification!.title.toString(),
-          htmlFormatContentTitle: true,
-        );
-        AndroidNotificationDetails androidNotificationDetails =
-            AndroidNotificationDetails(
-          'panico',
-          'panico',
-          importance: Importance.max,
-          styleInformation: bigTextStyleInformation,
-          priority: Priority.max,
-          playSound: true,
-        );
-
-        NotificationDetails platformChannerSpecifics =
-            NotificationDetails(android: androidNotificationDetails);
-        await flutterLocalNotificationsPlugin.show(
-            0,
-            message.notification!.title,
-            message.notification!.body,
-            platformChannerSpecifics,
-            payload: message.data['body']);
-      });
-    }
-
     useEffect(() {
       mapProvider.getCurrentLocation();
       mapProvider.getAlerts();
       mapProvider.getPeople();
       mapProvider.getTokens();
-      requestPermission();
-      getToken();
-      initInfo();
+      notProvider.requestPermission();
+      notProvider.mostrarNotificacion();
+      notProvider.getToken(mapProvider.user);
+      notProvider.initInfo();
+      notProvider.messagesStream.listen(
+        (event) {
+          print('Hello: ${event[0]}');
+          // Navigator.push(context, MaterialPageRoute(builder: (context) => MapAlertScreen(alertPosition: LatLng(event, _longitude)),),);
+        },
+      );
+
       getConnectivity();
       return () {
         subscription.value?.cancel();
       };
-    }, [mapProvider.myPosition]);
+    }, [mapProvider.myPosition, mapProvider.user]);
 
     final currentIndex = useState(0);
     final screens = [
       const PrincipalScreen(),
       const MapScreen(),
-      const ContactsScreen(),
+      const AlertsScreen(),
       const SettingsScreen()
     ];
     return mapProvider.myPosition != null && mapProvider.tokens.isNotEmpty
@@ -205,8 +125,8 @@ class HomeScreen extends HookWidget {
                     textColor: Colors.white,
                   ),
                   GButton(
-                    icon: Icons.contacts_rounded,
-                    text: 'Contactos',
+                    icon: Icons.notification_important,
+                    text: 'Alertas',
                     iconActiveColor: Colors.white,
                     textColor: Colors.white,
                   ),
@@ -222,7 +142,9 @@ class HomeScreen extends HookWidget {
           )
         : const Scaffold(
             body: Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: Colors.blueAccent,
+              ),
             ),
           );
   }
@@ -236,38 +158,6 @@ class PrincipalScreen extends HookWidget {
     final mapProvider = Provider.of<MapProvider>(context);
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: Colors.blueAccent,
-        label: const Text('Alertas'),
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            builder: (context) {
-              return mapProvider.alerts.isNotEmpty
-                  ? SizedBox(
-                      height: 600,
-                      child: ListView.builder(
-                        itemCount: mapProvider.alerts.length,
-                        itemBuilder: (_, i) {
-                          final alert = mapProvider.alerts[i];
-                          return ListTile(
-                            leading: const Icon(Icons.add_alert_rounded),
-                            title: Text(
-                                '${alert['nombres']} ${alert['apellidos']}'),
-                            subtitle: Text(
-                                "Latitud: ${alert['latitud']} ~ Longitud: ${alert['longitud']}"),
-                          );
-                        },
-                      ),
-                    )
-                  : const Center(
-                      child: CircularProgressIndicator(),
-                    );
-            },
-          );
-        },
-        icon: const Icon(Icons.notification_important),
-      ),
       body: SizedBox(
         width: double.infinity,
         height: double.infinity,
@@ -286,7 +176,11 @@ class PrincipalScreen extends HookWidget {
                   backgroundColor: MaterialStateColor.resolveWith(
                     (states) => Colors.redAccent,
                   )),
-              onPressed: () {},
+              onPressed: () async {
+                mapProvider.sendAlert(mapProvider.currentUser?['nombres'],
+                    mapProvider.currentUser?['apellidos']);
+                mapProvider.sendPushMessage();
+              },
               child: const Text(
                 'ALERTAR!',
                 style: TextStyle(

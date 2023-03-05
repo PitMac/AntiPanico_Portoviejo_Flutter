@@ -33,24 +33,24 @@ class MapProvider with ChangeNotifier {
 
   void sendPushMessage() async {
     try {
-      await http.post(Uri.parse('https://fcm.googleapis.com/send'),
+      await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
           headers: <String, String>{
             'Content-Type': 'application/json',
             'Authorization':
-                'Bearer ya29.a0AX9GBdUbaWSbNa27gAMN3OHk54KB-1nl5kqL40ROaMQOQLWKOVcBoOO8DMv04bRb3DKeO-cVemNF4lPoHrWW06U-wfkONvRil31SFkTriyxtfKLMaoMEqQZwEEMzJcL71wQ0wYqUL4kNxyi6EaSJ2EAoIWL6N-EaCgYKAfYSAQASFQHUCsbCXvlFMDf8nXHWlGti-0GrIg0166'
+                'key=AAAAJ9iKEI8:APA91bHMpoujnkWsa9d-BfbHr3k5p_2vtCbCTf1qEFwWrdDCfPP1pXQNM45LHi3WppGfjK485brp6StRK7wKyOfIaLhWAqDUR8RpblKtNgCkeYIAiQ-iYrWx9812E746emtegXbvitA4'
           },
           body: jsonEncode({
-            {
-//     "message": {
-//         "token": "esSMJTJeRTie0tVs3aeYU_:APA91bFTTkLpEe1lmxrFo42amC7R0wIrJaM9RvIjMP2mCDqAKJRVXmh3UxOfZ5qI_WLGDshIGbh-eIg2djGNxXFjQzDxRARe1ZNoCyDN2kjZb1nf4qkb8yBkaGsd4aC2kBgwi8ylPiAZ",
-//         "data": {
-//             "body": "Body of Your Notification in data",
-//             "title": "Title of Your Notification in data"
-//         }
-//     }
-            }
+            "notification": {"title": "Alerta!", "body": "Alerta de Panico"},
+            "priority": "high",
+            "data": {
+              "latitud": _myPosition?.latitude,
+              "longitud": _myPosition?.longitude
+            },
+            "to": "/topics/all"
           }));
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<Position> determinePosition() async {
@@ -77,6 +77,7 @@ class MapProvider with ChangeNotifier {
     QuerySnapshot querySnapshot = await collectionReference.get();
     for (var alert in querySnapshot.docs) {
       alerts.add(alert.data());
+      notifyListeners();
     }
 
     return alerts;
@@ -107,5 +108,17 @@ class MapProvider with ChangeNotifier {
     user = null;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('user');
+  }
+
+  Future<void> sendAlert(
+    String names,
+    String lastnames,
+  ) async {
+    await db.collection("alertas").add({
+      "nombres": names,
+      "apellidos": lastnames,
+      "latitud": _myPosition?.latitude,
+      "longitud": _myPosition?.longitude
+    });
   }
 }

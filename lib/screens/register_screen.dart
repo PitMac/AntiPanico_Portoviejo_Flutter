@@ -53,18 +53,18 @@ class RegisterScreen extends HookWidget {
             ),
             Align(
               alignment: Alignment.bottomCenter,
-              child: SingleChildScrollView(
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(30),
-                    ),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(30),
                   ),
-                  height: size.height * 0.7,
-                  width: double.infinity,
+                ),
+                height: size.height * 0.7,
+                width: double.infinity,
+                child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -153,7 +153,7 @@ class RegisterScreen extends HookWidget {
                               mapProvider.getPeople();
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                snackBarWidget(
+                                snackBarWidget2(
                                     validationProvider, Colors.redAccent),
                               );
                             }

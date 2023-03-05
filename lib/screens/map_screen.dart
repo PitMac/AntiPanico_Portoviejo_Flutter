@@ -26,7 +26,7 @@ class MapScreen extends HookWidget {
           final mark = Marker(
             point: myPosition,
             builder: (context) {
-              return const _MyLocationMarker();
+              return _myLocationMarker();
             },
           );
           marker.value.add(mark);
@@ -37,7 +37,7 @@ class MapScreen extends HookWidget {
             point: LatLng(mapProvider.alerts[i]['latitud'],
                 mapProvider.alerts[i]['longitud']),
             builder: (context) {
-              return const _MyLocationMarker2();
+              return _alertLocation();
             },
           );
           marker.value.add(mark);
@@ -60,14 +60,7 @@ class MapScreen extends HookWidget {
 
     return Scaffold(
       body: myPosition != null
-          ?
-          // ListView.builder(
-          //     itemCount: mapProvider.alerts.length,
-          //     itemBuilder: (context, index) {
-          //       return Text(mapProvider.alerts[index]['longitud'].toString());
-          //     },
-          //   )
-          FlutterMap(
+          ? FlutterMap(
               options: MapOptions(
                 center: myPosition,
                 minZoom: 5,
@@ -92,8 +85,10 @@ class MapScreen extends HookWidget {
       floatingActionButton: myPosition == null
           ? null
           : SpeedDial(
+              backgroundColor: Colors.blueAccent,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
+                borderRadius: BorderRadius.circular(10),
+              ),
               children: [
                 SpeedDialChild(
                   labelBackgroundColor:
@@ -126,56 +121,50 @@ class MapScreen extends HookWidget {
                   onTap: () => styleIndex.value = 4,
                 ),
               ],
-              activeChild: const Icon(Icons.close),
-              child: const Icon(Icons.swap_horiz_sharp),
+              activeChild: const Icon(
+                Icons.close,
+                color: Colors.white,
+              ),
+              child: const Icon(
+                Icons.swap_horiz_sharp,
+                color: Colors.white,
+              ),
             ),
     );
   }
 }
 
-class _MyLocationMarker extends StatelessWidget {
-  const _MyLocationMarker();
+SizedBox _myLocationMarker() {
+  return const SizedBox(
+    child: Icon(
+      Icons.person_pin_circle,
+      color: Colors.blueAccent,
+      size: 40,
+    ),
+  );
+}
 
-  @override
-  Widget build(BuildContext context) {
-    return const SizedBox(
-      child: Icon(
-        Icons.person_pin_circle,
-        color: Colors.blueAccent,
-        size: 40,
+Stack _alertLocation() {
+  return Stack(
+    children: [
+      Container(
+        height: 250,
+        width: 250,
+        decoration: BoxDecoration(
+          color: Colors.red.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(20),
+        ),
       ),
-      // decoration:
-      // const BoxDecoration(color: Colors.blueAccent, shape: BoxShape.circle),
-    );
-  }
-}
-
-class _MyLocationMarker2 extends StatelessWidget {
-  const _MyLocationMarker2();
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          height: 250,
-          width: 250,
-          decoration: BoxDecoration(
-            color: Colors.red.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(20),
+      const Center(
+        child: SizedBox(
+          height: 25,
+          width: 25,
+          child: Icon(
+            Icons.live_help,
+            color: Colors.red,
           ),
         ),
-        const Center(
-          child: SizedBox(
-            height: 25,
-            width: 25,
-            child: Icon(
-              Icons.live_help,
-              color: Colors.red,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
 }

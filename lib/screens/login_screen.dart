@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -147,81 +148,89 @@ class FormWidget extends HookWidget {
           height: size.height * 0.5,
           width: double.infinity,
           child: mapProvider.people.isNotEmpty
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Inicio de sesión',
-                      style: TextStyle(
-                        color: Colors.blueAccent,
-                        fontSize: 30,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    textField('Correo: ', false, 'test@test.com', Icons.person,
-                        emailController),
-                    const SizedBox(height: 20),
-                    textField('Contraseña: ', true, '*********', Icons.lock,
-                        passwordController),
-                    const SizedBox(height: 30),
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.blueAccent,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      child: ElevatedButton(
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateColor.resolveWith(
-                              (states) => Colors.blueAccent),
+              ? SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Inicio de sesión',
+                        style: TextStyle(
+                          color: Colors.blueAccent,
+                          fontSize: 30,
+                          fontWeight: FontWeight.w600,
                         ),
-                        onPressed: () {
-                          final state = validationProvider.isSecureLoginForm(
-                            emailController,
-                            passwordController,
-                            mapProvider.people,
-                          );
-                          if (state) {
-                            if (validationProvider.isLoading) {
+                      ),
+                      const SizedBox(height: 25),
+                      textField('Correo: ', false, 'test@test.com',
+                          Icons.person, emailController),
+                      const SizedBox(height: 20),
+                      textField('Contraseña: ', true, '*********', Icons.lock,
+                          passwordController),
+                      const SizedBox(height: 30),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.blueAccent,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateColor.resolveWith(
+                                (states) => Colors.blueAccent),
+                          ),
+                          onPressed: () async {
+                            final state = validationProvider.isSecureLoginForm(
+                              emailController,
+                              passwordController,
+                              mapProvider.people,
+                            );
+                            if (state) {
+                              if (validationProvider.isLoading) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  snackBarWidget(
+                                      validationProvider, Colors.redAccent),
+                                );
+                              }
+                              final SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              String? user = prefs.getString('user');
+                              if (user != null) {
+                                mapProvider.user = user;
+                              }
+                              Navigator.pushReplacementNamed(context, '/home');
+                            } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 snackBarWidget(
                                     validationProvider, Colors.redAccent),
                               );
                             }
-                            Navigator.pushReplacementNamed(context, '/home');
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              snackBarWidget(
-                                  validationProvider, Colors.redAccent),
-                            );
-                          }
-                        },
-                        child: const Text(
-                          'Ingresar',
-                          style: TextStyle(color: Colors.white),
+                          },
+                          child: const Text(
+                            'Ingresar',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text('No tienes cuenta todavia?  '),
-                        InkWell(
-                          child: Text(
-                            'Registrar',
-                            style: TextStyle(color: Colors.blue[700]),
-                          ),
-                          onTap: () {
-                            Navigator.pushNamed(context, '/register');
-                          },
-                        )
-                      ],
-                    )
-                  ],
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('No tienes cuenta todavia?  '),
+                          InkWell(
+                            child: Text(
+                              'Registrar',
+                              style: TextStyle(color: Colors.blue[700]),
+                            ),
+                            onTap: () {
+                              Navigator.pushNamed(context, '/register');
+                            },
+                          )
+                        ],
+                      )
+                    ],
+                  ),
                 )
               : const Center(child: CircularProgressIndicator()),
         ),
